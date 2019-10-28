@@ -163,6 +163,7 @@ class VisualizeTestSet(Callback):
 
     def _before_train(self):
         self.val_ds = get_data(self.data, isTrain=False)
+        self.val_ds.reset_state()
 
     def _trigger(self):
         idx = 0
