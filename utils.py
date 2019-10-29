@@ -133,6 +133,7 @@ def get_data(datadir, isTrain=True):
             imgaug.RandomResize(resize_range, resize_range,
                 aspect_ratio_thres=0),
             imgaug.RandomCrop(SHAPE),
+            imgaug.GaussianBlur(max_size=1),
         ]
     else:
         augs = [imgaug.ResizeShortestEdge(int(SHAPE * 1.12)),
