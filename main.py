@@ -42,7 +42,7 @@ if __name__ == '__main__':
     # train 1 D after 2 G
     SeparateGANTrainer(data, Model(),2).train_with_defaults(
         callbacks=[
-            PeriodicTrigger(ModelSaver(), every_k_epochs=20),
+            PeriodicTrigger(ModelSaver(), every_k_epochs=10),
             PeriodicTrigger(VisualizeTestSet(args.data), every_k_epochs=3),
             ScheduledHyperParamSetter(
                                 'learning_rate',
