@@ -8,7 +8,7 @@ from utils import *
 
 import tensorpack.tfutils.symbolic_functions as symbf
 
-SHAPE = 128
+SHAPE = 256
 BATCH = 16
 TEST_BATCH = 32
 NF = 64  # channel size
@@ -67,13 +67,13 @@ class Model(GANModelDesc):
 
             relu3 = Conv2D('convf', relu2, NF*8, kernel_shape=3, stride=1)
             atrous = tf.contrib.layers.conv2d(relu3, NF*8, kernel_size=3,
-                    data_format='NCHW', rate=2,
+                    data_format='NHWC', rate=2,
                     activation_fn=INLReLU, biases_initializer=None)
             atrous2 = tf.contrib.layers.conv2d(atrous, NF*8, kernel_size=3,
-                    data_format='NCHW', rate=4,
+                    data_format='NHWC', rate=4,
                     activation_fn=INLReLU, biases_initializer=None)
             atrous3 = tf.contrib.layers.conv2d(atrous2, NF*8, kernel_size=3,
-                    data_format='NCHW', rate=8,
+                    data_format='NHWC', rate=8,
                     activation_fn=INLReLU, biases_initializer=None)
             merge = tf.concat([relu3, atrous3], axis=1)
             clean = Conv2D('mConv', merge, NF*8, kernel_shape=3, stride=1)
@@ -147,13 +147,12 @@ class Model(GANModelDesc):
 
     def build_graph(self, A, B):
         #A, B = inputs
-        A = tf.transpose(A / 255.0, [0, 3, 1, 2])
-        B = tf.transpose(B / 255.0, [0, 3, 1, 2])
+        A = A / 255.0
+        B = B / 255.0
 
 
         def viz3(name, a, b, c):
-            im = tf.concat([a, b, c], axis=3)
-            im = tf.transpose(im, [0, 2, 3, 1])
+            im = tf.concat([a, b, c], axis=2)
             im = (im) * 255
             im = tf.clip_by_value(im, 0, 255)
             im = tf.cast(im, tf.uint8, name='viz_' + name)
@@ -166,7 +165,7 @@ class Model(GANModelDesc):
                       use_bias=False), \
                 argscope(BatchNorm, gamma_init=tf.random_uniform_initializer()), \
                 argscope([Conv2D, Deconv2D, BatchNorm, InstanceNorm],
-                        data_format='NCHW'):
+                        data_format='NHWC'):
                 #argscope(LeakyReLU, alpha=0.2):
             with tf.variable_scope('gen'):
                 with tf.variable_scope('B'):
