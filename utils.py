@@ -5,7 +5,7 @@ from tensorpack.utils.viz import *
 import tensorflow as tf
 import numpy as np
 
-SHAPE = 128
+SHAPE = 256
 BATCH = 16
 TEST_BATCH = 32
 NF = 64  # channel size
@@ -77,9 +77,6 @@ def tf_ssim(img1, img2, cs_map=False, mean_metric=True, size=8, sigma=1.5):
 
 
 def tf_ms_ssim(img1, img2, mean_metric=True, level=5):
-    #From NCHW to NHWC
-    img1 = tf.transpose(img1, [0, 2, 3, 1])
-    img2 = tf.transpose(img2, [0, 2, 3, 1])
 
     weight = tf.constant([0.0448, 0.2856, 0.3001, 0.2363, 0.1333], dtype=tf.float32)
     mssim = []
@@ -133,7 +130,6 @@ def get_data(datadir, isTrain=True):
             imgaug.RandomResize(resize_range, resize_range,
                 aspect_ratio_thres=0),
             imgaug.RandomCrop(SHAPE),
-            imgaug.GaussianBlur(max_size=1),
         ]
     else:
         augs = [imgaug.ResizeShortestEdge(int(SHAPE * 1.12)),
