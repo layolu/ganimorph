@@ -5,7 +5,7 @@ from tensorpack.utils.viz import *
 import tensorflow as tf
 import numpy as np
 
-SHAPE = 256
+SHAPE = 128
 BATCH = 16
 TEST_BATCH = 32
 NF = 64  # channel size
@@ -48,7 +48,7 @@ def tf_ssim(img1, img2, cs_map=False, mean_metric=True, size=8, sigma=1.5):
     window = _tf_fspecial_gauss(size, sigma) # window shape [size, size]
     K1 = 0.03
     K2 = 0.05
-    L = 1  # depth of image (255 in case the image has a differnt scale)
+    L = 1 # depth of image (255 in case the image has a differnt scale)
     C1 = (K1*L)**2
     C2 = (K2*L)**2
     mu1 = tf.nn.conv2d(img1, window, strides=[1,1,1,1], padding='VALID')
@@ -102,8 +102,8 @@ def tf_ms_ssim(img1, img2, mean_metric=True, level=5):
     return value
 
 def tf_dssim(img1, img2):
-    img1 = tf.unstack(tf.expand_dims(img1, axis=2), axis=1)
-    img2 = tf.unstack(tf.expand_dims(img2, axis=2), axis=1)
+    img1 = tf.unstack(tf.expand_dims(img1, axis=3), axis=4)
+    img2 = tf.unstack(tf.expand_dims(img2, axis=3), axis=4)
     value = tf.stack([tf_ms_ssim(i1, i2) for i1, i2 in zip(img1, img2)], axis=0)
     return tf.subtract(1.0, tf.reduce_sum(value)/3, name='DSSIM_loss')
 

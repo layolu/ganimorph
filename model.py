@@ -8,7 +8,7 @@ from utils import *
 
 import tensorpack.tfutils.symbolic_functions as symbf
 
-SHAPE = 256
+SHAPE = 128
 BATCH = 16
 TEST_BATCH = 32
 NF = 64  # channel size
@@ -25,7 +25,7 @@ class Model(GANModelDesc):
             l = (LinearWrap(x)
                     .Conv2D('conv0', chan, stride=1, kernel_shape=3)
                     .Conv2D('conv1', chan, stride=1, kernel_shape=3)())
-            l = (LinearWrap(tf.concat([l, input], axis=1))
+            l = (LinearWrap(tf.concat([l, input], axis=3))
                     .Conv2D('conv2', chan, stride=1, kernel_shape=3)())
             return l
 
@@ -50,10 +50,10 @@ class Model(GANModelDesc):
             conv3 = Conv2D('conv3', layer2, NF * 8)
             l = res_group(conv3, 'layer3', subDepth, NF*8)
             deconv0 = Deconv2D('deconv0', l, NF * 4)
-            up1 = tf.concat([deconv0, layer2], axis=1)
+            up1 = tf.concat([deconv0, layer2], axis=3)
             b_layer_2 = res_group(up1, 'blayer2', subDepth, NF * 4)
             deconv1 = Deconv2D('deconv1', b_layer_2, NF * 2)
-            up2 = tf.concat([deconv1, layer1], axis=1)
+            up2 = tf.concat([deconv1, layer1], axis=3)
             b_layer_1 = res_group(up2, 'blayer1', subDepth, NF * 2)
             deconv2 = Deconv2D('deconv2', b_layer_1, NF * 1)
             deconv3 = Deconv2D('deconv3', deconv2, 3, nl=tf.sigmoid)
@@ -75,7 +75,7 @@ class Model(GANModelDesc):
             atrous3 = tf.contrib.layers.conv2d(atrous2, NF*8, kernel_size=3,
                     data_format='NHWC', rate=8,
                     activation_fn=INLReLU, biases_initializer=None)
-            merge = tf.concat([relu3, atrous3], axis=1)
+            merge = tf.concat([relu3, atrous3], axis=3)
             clean = Conv2D('mConv', merge, NF*8, kernel_shape=3, stride=1)
             lsgan = Conv2D('lsconv', clean, 1, stride=1, nl=tf.identity,
                     use_bias=False)
